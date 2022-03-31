@@ -9,7 +9,7 @@ import (
 func TestFunctionalPredicate(t *testing.T) {
 	var container = Container[models.YoungPerson]{
 		People: []models.YoungPerson{
-			models.YoungPerson{
+			{
 				Person:            models.Person{Message: "hi", Age: 30},
 				AdditionalMessage: "I am young Person",
 			},
@@ -90,7 +90,7 @@ func TestPanicFailing(t *testing.T) {
 func TestErrorHandling(t *testing.T) {
 	var container = Container[models.YoungPerson]{
 		People: []models.YoungPerson{
-			models.YoungPerson{
+			{
 				Person:            models.Person{Message: "hi", Age: 30},
 				AdditionalMessage: "I am Young"}},
 	}
