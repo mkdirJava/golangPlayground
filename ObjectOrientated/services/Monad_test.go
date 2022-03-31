@@ -7,20 +7,25 @@ import (
 )
 
 func TestFunctionalPredicate(t *testing.T) {
-	var container = Container[models.Person]{
-		People: []models.Person{{Message: "hi", Age: 30}},
+	var container = Container[models.YoungPerson]{
+		People: []models.YoungPerson{
+			models.YoungPerson{
+				Person:            models.Person{Message: "hi", Age: 30},
+				AdditionalMessage: "I am young Person",
+			},
+		},
 	}
 
-	var peopleOver1 = container.Filter(func(person models.Person) bool {
-		return person.Age > 1
+	var peopleOver1 = container.Filter(func(person models.YoungPerson) bool {
+		return person.Person.Age > 1
 	})
 
 	if len(peopleOver1.People) != 1 {
 		t.Fail()
 	}
 
-	var peopleOver45 = peopleOver1.Filter(func(person models.Person) bool {
-		return person.Age > 45
+	var peopleOver45 = peopleOver1.Filter(func(person models.YoungPerson) bool {
+		return person.Person.Age > 45
 	})
 	if len(peopleOver45.People) > 1 {
 		t.Fail()
@@ -53,8 +58,11 @@ func TestPolyMorphism(t *testing.T) {
 }
 
 func TestPanicHandling(t *testing.T) {
-	var container = Container[models.Person]{
-		People: []models.Person{{Message: "hi", Age: 30}},
+	var container = Container[models.MiddleAgedPerson]{
+		People: []models.MiddleAgedPerson{{
+			Person:            models.Person{Message: "hi", Age: 30},
+			AdditionalMessage: "I am young Person"},
+		},
 	}
 	container.DoSomePanicing(true)
 }
@@ -67,15 +75,24 @@ func TestPanicFailing(t *testing.T) {
 		}
 	}()
 
-	var container = Container[models.Person]{
-		People: []models.Person{{Message: "hi", Age: 30}},
+	var container = Container[models.OldPerson]{
+		People: []models.OldPerson{{
+			Person: models.Person{
+				Message: "hi",
+				Age:     30,
+			},
+			AdditionalMessage: "I am old",
+		}},
 	}
 	container.DoSomePanicing(false)
 }
 
 func TestErrorHandling(t *testing.T) {
-	var container = Container[models.Person]{
-		People: []models.Person{{Message: "hi", Age: 30}},
+	var container = Container[models.YoungPerson]{
+		People: []models.YoungPerson{
+			models.YoungPerson{
+				Person:            models.Person{Message: "hi", Age: 30},
+				AdditionalMessage: "I am Young"}},
 	}
 	result, error := container.DoSomeCheckedExecptions()
 	if error == nil || result != "" {

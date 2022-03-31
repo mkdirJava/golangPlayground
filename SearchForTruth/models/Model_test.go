@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
@@ -191,6 +192,46 @@ func TestMultipleStartPoints(t *testing.T) {
 
 }
 
+func TestModelWontStartUnlessAllRequirementsAreFullfilled(t *testing.T) {
+
+	var oneModelShouldRunTestProject = "oneModelShouldRunTestProject"
+	var TestModel2 = Model{
+		Id:        "2",
+		NextModel: []*Model{},
+		Input:     map[string]string{"TestModel1Results": "", "AnotherReq": ""},
+		// Mocked out data
+		Output: map[string]string{"TestModel1Results": ""},
+		Action: func() {
+			//Do some logic here, the input would be in the model
+			// Output the results to the method call, in production this would be a web call
+			UpdateModel(oneModelShouldRunTestProject, "1", map[string]string{"TestModel1Results": "RESULTS_FROM_TEST_MODEL_1"})
+		},
+	}
+
+	var TestModel1 = Model{
+		Id:        "1",
+		NextModel: []*Model{&TestModel2},
+		Input:     map[string]string{"startingData": "BOB"},
+		// Mocked out data
+		Output: map[string]string{"TestModel1Results": ""},
+		Action: func() {
+			//Do some logic here, the input would be in the model
+			// Output the results to the method call, in production this would be a web call
+			UpdateModel(oneModelShouldRunTestProject, "1", map[string]string{"TestModel1Results": "RESULTS_FROM_TEST_MODEL_1"})
+		},
+	}
+
+	var testProject = Project{
+		Id:           oneModelShouldRunTestProject,
+		Values:       []Value{},
+		Requirements: []Requirement{},
+		Models:       []Model{TestModel1},
+	}
+	projectCollection = append(projectCollection, testProject)
+	testProject.RunModels(map[string]string{"startingData": "BOB"})
+
+	fmt.Println("hi there world")
+}
 func assertCondition(projectId string, modelId string, pred func(Model) bool, t *testing.T) {
 	foundModel, err := findModelFacade(projectId, modelId)
 	if err != nil {
@@ -230,6 +271,15 @@ func findModelFacade(projectId string, modelId string) (*Model, error) {
 		return foundModel, nil
 	}
 	return nil, errors.New("Cannot find Model")
+}
+
+func verifyInputsFullfilled(input map[string]string) bool {
+	for _, value := range input {
+		if len(value) == 0 {
+			return false
+		}
+	}
+	return true
 }
 
 /*
@@ -290,9 +340,13 @@ func UpdateModel(projectId string, modelId string, updatePacket map[string]strin
 			if mappingError != nil {
 				return errors.New("There has been a mapping error")
 			}
-			// Passing in data to the next action
-			nextModel.Input = nextActionInput
-			nextModel.DoAction()
+			// verify all of the inputs are present before starting the next model
+			if verifyInputsFullfilled(nextActionInput) {
+				// Passing in data to the next action
+				nextModel.Input = nextActionInput
+				nextModel.DoAction()
+			}
+
 		}
 	} else {
 		// We have finished the line, might want to do a call here?

@@ -6,7 +6,7 @@ import (
 	models "goplayground/objects/models"
 )
 
-type Container[T models.Person] struct {
+type Container[T models.IPerson] struct {
 	People []T
 }
 
