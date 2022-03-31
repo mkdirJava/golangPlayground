@@ -8,6 +8,10 @@ type Person struct {
 	HairColor string
 }
 
+func (person Person) DoSomthing() string {
+	return fmt.Sprintf("")
+}
+
 type YoungPerson struct {
 	Person            Person
 	AdditionalMessage string

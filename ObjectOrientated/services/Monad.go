@@ -29,7 +29,6 @@ func (container Container[T]) DoSomePanicing(shouldRecover bool) {
 			}
 		}
 	}()
-
 	panic("Somthing went Wrong")
 }
 
