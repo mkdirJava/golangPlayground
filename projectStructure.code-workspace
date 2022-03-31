@@ -1,0 +1,20 @@
+{
+	"folders" :[
+		{
+			"name": "root",
+			"path": "."
+		},
+		{
+			"name": "ObjectOrientated",
+			"path": ".//ObjectOrientated"
+		},
+		{
+			"name": "Importing",
+			"path": "Importing"
+		},
+		{
+			"path": "SearchForTruth"
+		}
+	]
+
+}
